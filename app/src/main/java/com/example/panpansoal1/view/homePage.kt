@@ -52,26 +52,36 @@ fun HomePage(viewModel: WeatherViewModel) {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            OutlinedTextField(
-                value = city,
-                onValueChange = { city = it },
-                label = { Text("Enter City") },
-                modifier = Modifier.fillMaxWidth()
-            )
 
-            Button(
-                onClick = { viewModel.fetchWeather(city, "2833abb8068f9cb2346de10e82a6f2c1") },
+            // 🔍 TextField dan tombol search sejajar
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp)
+                    .padding(bottom = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Search")
+                OutlinedTextField(
+                    value = city,
+                    onValueChange = { city = it },
+                    label = { Text("Enter City") },
+                    modifier = Modifier.weight(1f)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Button(
+                    onClick = { viewModel.fetchWeather(city, "2833abb8068f9cb2346de10e82a6f2c1") },
+                    modifier = Modifier.height(56.dp)
+                ) {
+                    Text("Search")
+                }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            // 🧾 Konten utama
             if (error.isNotEmpty()) {
                 Text(text = error, color = Color.Red)
             } else if (weather != null) {
+
                 val weatherType = weather.weather.firstOrNull()?.main ?: "Clear"
                 val pandaImage = when (weatherType) {
                     "Rain" -> R.drawable.rain
@@ -79,10 +89,8 @@ fun HomePage(viewModel: WeatherViewModel) {
                     else -> R.drawable.clear
                 }
 
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                // 🏙️ Kota & tanggal
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center,
@@ -104,14 +112,12 @@ fun HomePage(viewModel: WeatherViewModel) {
 
                     Text(
                         text = currentDate,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 4.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                         style = MaterialTheme.typography.titleLarge.copy(
                             color = Color.White,
                             fontSize = 22.sp,
-                            fontWeight =Bold
+                            fontWeight = Bold
                         )
                     )
 
@@ -123,7 +129,7 @@ fun HomePage(viewModel: WeatherViewModel) {
                     )
                 }
 
-
+                // 🌡️ Suhu + gambar
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -131,9 +137,7 @@ fun HomePage(viewModel: WeatherViewModel) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.Start
-                    ) {
+                    Column {
                         Text(
                             text = "${weather.main.temp}°C",
                             style = MaterialTheme.typography.headlineLarge.copy(fontSize = 36.sp),
@@ -146,23 +150,18 @@ fun HomePage(viewModel: WeatherViewModel) {
                         )
                     }
 
-
                     Image(
                         painter = painterResource(id = pandaImage),
                         contentDescription = "Weather Image",
-                        modifier = Modifier
-                            .size(120.dp)
-                            .padding(end = 8.dp)
+                        modifier = Modifier.size(120.dp)
                     )
                 }
 
+                // 📊 Grid info (humidity, wind, dll)
                 val weatherList = WeatherDataMapper.fromApi(weather)
-
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     items(weatherList) { item ->
                         WeatherCard(item = item)
@@ -171,8 +170,7 @@ fun HomePage(viewModel: WeatherViewModel) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Spacer(modifier = Modifier.height(16.dp))
-
+                // 🌅 Sunrise & Sunset
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
@@ -183,26 +181,17 @@ fun HomePage(viewModel: WeatherViewModel) {
                             contentDescription = "Sunrise",
                             modifier = Modifier.size(48.dp)
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(text = "Sunrise", style = MaterialTheme.typography.titleSmall.copy(color = Color.White))
-                        Text(
-                            text = formatUnixTime(weather.sys.sunrise),
-                            style = MaterialTheme.typography.bodyMedium.copy(color = Color.Yellow)
-                        )
+                        Text("Sunrise", color = Color.White)
+                        Text(formatUnixTime(weather.sys.sunrise), color = Color.Yellow)
                     }
-
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Image(
                             painter = painterResource(id = R.drawable.vector_21png),
                             contentDescription = "Sunset",
                             modifier = Modifier.size(48.dp)
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(text = "Sunset", style = MaterialTheme.typography.titleSmall.copy(color = Color.White))
-                        Text(
-                            text = formatUnixTime(weather.sys.sunset),
-                            style = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFFFF7043))
-                        )
+                        Text("Sunset", color = Color.White)
+                        Text(formatUnixTime(weather.sys.sunset), color = Color(0xFFFF7043))
                     }
                 }
             }
@@ -211,8 +200,7 @@ fun HomePage(viewModel: WeatherViewModel) {
 }
 
 
-
-fun formatUnixTime(timestamp: Long): String {
+    fun formatUnixTime(timestamp: Long): String {
     val date = Date(timestamp * 1000)
     val format = SimpleDateFormat("HH:mm", Locale.getDefault())
     return format.format(date)
