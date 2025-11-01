@@ -11,6 +11,7 @@ import android.util.Log
 
 class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() {
 
+
     private val _weatherState = mutableStateOf<WeatherModel?>(null)
     val weatherState: State<WeatherModel?> = _weatherState
 
